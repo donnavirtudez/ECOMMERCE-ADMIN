@@ -57,7 +57,7 @@ export function DataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn(searchKey)?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
         />
       </div>
 
@@ -118,6 +118,7 @@ export function DataTable<TData, TValue>({
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          className="cursor-pointer"
         >
           Previous
         </Button>
@@ -126,6 +127,7 @@ export function DataTable<TData, TValue>({
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          className="cursor-pointer"
         >
           Next
         </Button>

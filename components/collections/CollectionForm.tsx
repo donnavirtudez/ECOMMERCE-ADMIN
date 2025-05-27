@@ -125,6 +125,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
                     placeholder="Title"
                     {...field}
                     onKeyDown={handleKeyPress}
+                    className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                   />
                 </FormControl>
                 <FormMessage className="text-[#DC0000]" />
@@ -141,7 +142,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
                   <Textarea
                     placeholder="Description"
                     {...field}
-                    className="h-32"
+                    className="h-32 focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>

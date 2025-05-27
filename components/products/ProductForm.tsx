@@ -181,6 +181,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                     placeholder="Title"
                     {...field}
                     onKeyDown={handleKeyPress}
+                    className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                   />
                 </FormControl>
                 <FormMessage className="text-[#DC0000]" />
@@ -197,7 +198,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                   <Textarea
                     placeholder="Description"
                     {...field}
-                    className="h-32"
+                    className="h-32 focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>
@@ -226,12 +227,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="md:grid md:grid-cols-3 gap-8 space-y-2 md:space-y-0">
             <FormField
               control={form.control}
               name="price"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mb-4">
                   <FormLabel>Price (₱)</FormLabel>
                   <FormControl>
                     <Input
@@ -239,6 +240,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                       placeholder="Price"
                       {...field}
                       onKeyDown={handleKeyPress}
+                      className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                     />
                   </FormControl>
                   <FormMessage className="text-[#DC0000]" />
@@ -249,7 +251,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
               control={form.control}
               name="expense"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mb-4">
                   <FormLabel>Expense (₱)</FormLabel>
                   <FormControl>
                     <Input
@@ -257,6 +259,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                       placeholder="Expense"
                       {...field}
                       onKeyDown={handleKeyPress}
+                      className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                     />
                   </FormControl>
                   <FormMessage className="text-[#DC0000]" />
@@ -267,13 +270,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
               control={form.control}
               name="category"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mb-4">
                   <FormLabel>Category</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Category"
                       {...field}
                       onKeyDown={handleKeyPress}
+                      className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
                     />
                   </FormControl>
                   <FormMessage className="text-[#DC0000]" />

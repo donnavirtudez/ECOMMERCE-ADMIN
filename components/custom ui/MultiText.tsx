@@ -21,8 +21,10 @@ const MultiText: React.FC<MultiTextProps> = ({
   const [inputValue, setInputValue] = useState("");
 
   const addValue = (item: string) => {
-    onChange(item);
-    setInputValue("");
+    if (item.trim() !== "") {
+      onChange(item.trim());
+      setInputValue("");
+    }
   };
 
   return (
@@ -30,6 +32,7 @@ const MultiText: React.FC<MultiTextProps> = ({
       <Input
         placeholder={placeholder}
         value={inputValue}
+        className="focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none"
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -39,7 +42,7 @@ const MultiText: React.FC<MultiTextProps> = ({
         }}
       />
 
-      <div className="flex gap-1 flex-wrap">
+      <div className="flex gap-1 flex-wrap mt-1">
         {value.map((item, index) => (
           <Badge
             key={index}
