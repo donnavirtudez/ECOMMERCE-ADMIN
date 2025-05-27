@@ -1,9 +1,9 @@
 "use client";
 
-import { UserButton, useUser, useClerk } from "@clerk/nextjs";
+import { UserButton, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 
@@ -12,14 +12,31 @@ import { navLinks } from "@/lib/constants";
 const TopBar = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const pathname = usePathname();
-
   const { signOut } = useClerk();
   const router = useRouter();
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
     router.push("/sign-in");
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="sticky top-0 z-20 w-full flex justify-between items-center px-8 py-4 bg-[#F0F0F0] shadow-xl lg:hidden">
@@ -39,10 +56,10 @@ const TopBar = () => {
         ))}
       </div>
 
-      <div className="relative flex gap-4 items-center">
+      <div className="relative flex gap-4 items-center" ref={dropdownRef}>
         <Menu
           className="cursor-pointer md:hidden"
-          onClick={() => setDropdownMenu(!dropdownMenu)}
+          onClick={() => setDropdownMenu((prev) => !prev)}
         />
         {dropdownMenu && (
           <div className="absolute top-10 right-6 flex flex-col gap-8 p-5 bg-[#FFFFFF] shadow-xl rounded-lg">
@@ -50,9 +67,12 @@ const TopBar = () => {
               <Link
                 href={link.url}
                 key={link.label}
-                className="flex gap-4 text-body-medium"
+                className={`flex gap-4 text-body-medium ${
+                  pathname === link.url ? "text-[#4E71FF]" : "text-[#616161]"
+                }`}
               >
-                {link.icon} <p>{link.label}</p>
+                {link.icon}
+                <p>{link.label}</p>
               </Link>
             ))}
           </div>
