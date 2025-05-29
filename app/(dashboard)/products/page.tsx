@@ -38,7 +38,7 @@ const Products = () => {
   ) : (
     <div className="px-10 py-5">
       <div className="flex items-center justify-between">
-        <p className="text-[30px] leading-[100%] font-[700] text-[#616161]">
+        <p className="text-[30px] leading-[100%] font-[700] text-gray-900">
           Products
         </p>
         <Button

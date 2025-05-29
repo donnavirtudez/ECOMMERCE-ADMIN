@@ -39,7 +39,7 @@ const TopBar = () => {
   }, []);
 
   return (
-    <div className="sticky top-0 z-20 w-full flex justify-between items-center px-8 py-4 bg-[#F0F0F0] shadow-xl lg:hidden">
+    <div className="sticky top-0 z-20 w-full flex justify-between items-center px-8 py-4 bg-[#F0F0F0] lg:hidden">
       <Image src="/BJ.png" alt="logo" width={150} height={70} />
 
       <div className="flex gap-8 max-md:hidden">
@@ -62,7 +62,7 @@ const TopBar = () => {
           onClick={() => setDropdownMenu((prev) => !prev)}
         />
         {dropdownMenu && (
-          <div className="absolute top-10 right-6 flex flex-col gap-8 p-5 bg-[#FFFFFF] shadow-xl rounded-lg">
+          <div className="absolute top-10 right-6 flex flex-col gap-8 p-5 bg-[#FFFFFF] shadow-lg rounded-lg">
             {navLinks.map((link) => (
               <Link
                 href={link.url}
