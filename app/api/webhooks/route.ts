@@ -1,82 +1,101 @@
-// import Customer from "@/lib/models/Customer";
-// import Order from "@/lib/models/Order";
-// import { connectToDB } from "@/lib/mongoDB";
-// import { NextRequest, NextResponse } from "next/server";
-// import { stripe } from "@/lib/stripe";
+import Customer from "@/lib/models/Customer";
+import Order from "@/lib/models/Order";
+import { connectToDB } from "@/lib/mongoDB";
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
 
-// export const POST = async (req: NextRequest) => {
-//   try {
-//     const rawBody = await req.text()
-//     const signature = req.headers.get("Stripe-Signature") as string
+export const stripe = new Stripe(process.env.NEXT_PUBCLIC_STRIPE_SECRET_KEY!, {
+  typescript: true,
+});
 
-//     const event = stripe.webhooks.constructEvent(
-//       rawBody,
-//       signature,
-//       process.env.STRIPE_WEBHOOK_SECRET!
-//     )
+interface ExtendedSession extends Stripe.Checkout.Session {
+  shipping_details?: {
+    address: {
+      line1?: string;
+      city?: string;
+      state?: string;
+      postal_code?: string;
+      country?: string;
+    };
+  };
+}
 
-//     if (event.type === "checkout.session.completed") {
-//       const session = event.data.object
+export const POST = async (req: NextRequest) => {
+  try {
+    const rawBody = await req.text();
+    const signature = req.headers.get("Stripe-Signature") as string;
 
-//       const customerInfo = {
-//         clerkId: session?.client_reference_id,
-//         name: session?.customer_details?.name,
-//         email: session?.customer_details?.email,
-//       }
+    const event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
 
-//       const shippingAddress = {
-//         street: session?.shipping_details?.address?.line1,
-//         city: session?.shipping_details?.address?.city,
-//         state: session?.shipping_details?.address?.state,
-//         postalCode: session?.shipping_details?.address?.postal_code,
-//         country: session?.shipping_details?.address?.country,
-//       }
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as ExtendedSession;
+      console.log("[webhooks_POST]", session);
 
-//       const retrieveSession = await stripe.checkout.sessions.retrieve(
-//         session.id,
-//         { expand: ["line_items.data.price.product"]}
-//       )
+      const customerInfo = {
+        clerkId: session?.client_reference_id,
+        name: session?.customer_details?.name,
+        email: session?.customer_details?.email,
+      };
 
-//       const lineItems = await retrieveSession?.line_items?.data
+      const shippingAddress = {
+        street: session?.shipping_details?.address?.line1,
+        city: session?.shipping_details?.address?.city,
+        state: session?.shipping_details?.address?.state,
+        postalCode: session?.shipping_details?.address?.postal_code,
+        country: session?.shipping_details?.address?.country,
+      };
 
-//       const orderItems = lineItems?.map((item: any) => {
-//         return {
-//           product: item.price.product.metadata.productId,
-//           color: item.price.product.metadata.color || "N/A",
-//           size: item.price.product.metadata.size || "N/A",
-//           quantity: item.quantity,
-//         }
-//       })
+      const retrieveSession = await stripe.checkout.sessions.retrieve(
+        session.id,
+        {
+          expand: ["line_items.data.price.product"],
+        }
+      );
 
-//       await connectToDB()
+      const lineItems = retrieveSession?.line_items?.data;
 
-//       const newOrder = new Order({
-//         customerClerkId: customerInfo.clerkId,
-//         products: orderItems,
-//         shippingAddress,
-//         shippingRate: session?.shipping_cost?.shipping_rate,
-//         totalAmount: session.amount_total ? session.amount_total / 100 : 0,
-//       })
+      const orderItems = lineItems?.map((item: any) => {
+        return {
+          product: item.price.product.metadata.productId,
+          color: item.price.product.metadata.color || "N/A",
+          size: item.price.product.metadata.size || "N/A",
+          quantity: item.quantity,
+        };
+      });
 
-//       await newOrder.save()
+      await connectToDB();
 
-//       let customer = await Customer.findOne({ clerkId: customerInfo.clerkId })
+      const newOrder = new Order({
+        customerClerkId: customerInfo.clerkId,
+        products: orderItems,
+        shippingAddress,
+        shippingRate: session?.shipping_cost?.shipping_rate,
+        totalAmount: session.amount_total ? session.amount_total / 100 : 0,
+      });
 
-//       if (customer) {
-//         customer.orders.push(newOrder._id)
-//       } else {
-//         customer = new Customer({
-//           ...customerInfo,
-//           orders: [newOrder._id],
-//         })
-//       }
+      await newOrder.save();
 
-//       await customer.save()
-//     }
+      let customer = await Customer.findOne({ clerkId: customerInfo.clerkId });
 
-//     return new NextResponse("Order created", { status: 200 })
-//   } catch (err) {
-//     console.log("[webhooks_POST]", err)
-//     return new NextResponse("Failed to create the order", { status: 500 })
-//   }
-// }
+      if (customer) {
+        customer.orders.push(newOrder._id);
+      } else {
+        customer = new Customer({
+          ...customerInfo,
+          orders: [newOrder._id],
+        });
+      }
+
+      await customer.save();
+    }
+
+    return new NextResponse("Order created", { status: 200 });
+  } catch (err) {
+    console.error("[webhooks_POST] Error:", err);
+    return new NextResponse("Failed to create the order", { status: 500 });
+  }
+};
