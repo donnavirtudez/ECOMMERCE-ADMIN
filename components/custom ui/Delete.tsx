@@ -55,19 +55,18 @@ const Delete: React.FC<DeleteProps> = ({ item, id }) => {
   };
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger asChild>
         <Button className="cursor-pointer bg-[#DC0000] text-[#FFFFFF]">
           <Trash className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="bg-[#FFFFFF] text-[#616161]">
+      <AlertDialogContent className="bg-[#FFFFFF] text-black border-none">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[#616161]">
+          <AlertDialogTitle className="text-gray-900">
             Are you sure?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your{" "}
-            {item}.
+            This will permanently delete your {item}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
