@@ -2,23 +2,7 @@ import Customer from "@/lib/models/Customer";
 import Order from "@/lib/models/Order";
 import { connectToDB } from "@/lib/mongoDB";
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-export const stripe = new Stripe(process.env.NEXT_PUBCLIC_STRIPE_SECRET_KEY!, {
-  typescript: true,
-});
-
-interface ExtendedSession extends Stripe.Checkout.Session {
-  shipping_details?: {
-    address: {
-      line1?: string;
-      city?: string;
-      state?: string;
-      postal_code?: string;
-      country?: string;
-    };
-  };
-}
+import { stripe } from "@/lib/stripe";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -32,8 +16,7 @@ export const POST = async (req: NextRequest) => {
     );
 
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object as ExtendedSession;
-      console.log("[webhooks_POST]", session);
+      const session = event.data.object as any;
 
       const customerInfo = {
         clerkId: session?.client_reference_id,
@@ -51,12 +34,10 @@ export const POST = async (req: NextRequest) => {
 
       const retrieveSession = await stripe.checkout.sessions.retrieve(
         session.id,
-        {
-          expand: ["line_items.data.price.product"],
-        }
+        { expand: ["line_items.data.price.product"] }
       );
 
-      const lineItems = retrieveSession?.line_items?.data;
+      const lineItems = await retrieveSession?.line_items?.data;
 
       const orderItems = lineItems?.map((item: any) => {
         return {
@@ -95,7 +76,7 @@ export const POST = async (req: NextRequest) => {
 
     return new NextResponse("Order created", { status: 200 });
   } catch (err) {
-    console.error("[webhooks_POST] Error:", err);
+    console.log("[webhooks_POST]", err);
     return new NextResponse("Failed to create the order", { status: 500 });
   }
 };

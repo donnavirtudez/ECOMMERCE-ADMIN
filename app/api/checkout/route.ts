@@ -1,9 +1,5 @@
-import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
-
-export const stripe = new Stripe(process.env.NEXT_PUBCLIC_STRIPE_SECRET_KEY!, {
-  typescript: true,
-});
+import { stripe } from "@/lib/stripe";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,8 +38,8 @@ export async function POST(req: NextRequest) {
         ],
       },
       shipping_options: [
-        { shipping_rate: "shr_1RUJRdPoSiSdfDr7Orx5st59" },
-        { shipping_rate: "shr_1RUJPSPoSiSdfDr70jRXEqPj" },
+        { shipping_rate: "shr_1RV3tHPoSiSdfDr7WuEOogco" },
+        { shipping_rate: "shr_1RV3usPoSiSdfDr7stDKCy3q" },
       ],
       line_items: cartItems.map((cartItem: any) => ({
         price_data: {
