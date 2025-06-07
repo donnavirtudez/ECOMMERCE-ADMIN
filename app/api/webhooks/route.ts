@@ -1,8 +1,9 @@
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
+import { connectToDB } from "@/lib/mongoDB";
 import Customer from "@/lib/models/Customer";
 import Order from "@/lib/models/Order";
-import { connectToDB } from "@/lib/mongoDB";
-import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -16,37 +17,41 @@ export const POST = async (req: NextRequest) => {
     );
 
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object as any;
+      const session = event.data.object as Stripe.Checkout.Session;
 
-      const customerInfo = {
-        clerkId: session?.client_reference_id,
-        name: session?.customer_details?.name,
-        email: session?.customer_details?.email,
-      };
+      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+        expand: [
+          "line_items.data.price.product",
+          "collected_information.shipping_details.address",
+        ],
+      });
+
+      const shippingDetails = (fullSession as any).collected_information
+        ?.shipping_details;
+      const address = shippingDetails?.address || {};
 
       const shippingAddress = {
-        street: session?.shipping_details?.address?.line1,
-        city: session?.shipping_details?.address?.city,
-        state: session?.shipping_details?.address?.state,
-        postalCode: session?.shipping_details?.address?.postal_code,
-        country: session?.shipping_details?.address?.country,
+        street: address.line1 || "",
+        city: address.city || "",
+        state: address.state || "",
+        postalCode: address.postal_code || "",
+        country: address.country || "",
       };
 
-      const retrieveSession = await stripe.checkout.sessions.retrieve(
-        session.id,
-        { expand: ["line_items.data.price.product"] }
-      );
+      const customerInfo = {
+        clerkId: fullSession.client_reference_id || "",
+        name: fullSession.customer_details?.name || "",
+        email: fullSession.customer_details?.email || "",
+      };
 
-      const lineItems = await retrieveSession?.line_items?.data;
+      const lineItems = fullSession.line_items?.data || [];
 
-      const orderItems = lineItems?.map((item: any) => {
-        return {
-          product: item.price.product.metadata.productId,
-          color: item.price.product.metadata.color || "N/A",
-          size: item.price.product.metadata.size || "N/A",
-          quantity: item.quantity,
-        };
-      });
+      const orderItems = lineItems.map((item: any) => ({
+        product: item.price.product.metadata.productId,
+        color: item.price.product.metadata.color || "N/A",
+        size: item.price.product.metadata.size || "N/A",
+        quantity: item.quantity,
+      }));
 
       await connectToDB();
 
@@ -54,8 +59,10 @@ export const POST = async (req: NextRequest) => {
         customerClerkId: customerInfo.clerkId,
         products: orderItems,
         shippingAddress,
-        shippingRate: session?.shipping_cost?.shipping_rate,
-        totalAmount: session.amount_total ? session.amount_total / 100 : 0,
+        shippingRate: fullSession.shipping_cost?.shipping_rate || "",
+        totalAmount: fullSession.amount_total
+          ? fullSession.amount_total / 100
+          : 0,
       });
 
       await newOrder.save();
@@ -72,11 +79,13 @@ export const POST = async (req: NextRequest) => {
       }
 
       await customer.save();
+
+      return new NextResponse("Order created", { status: 200 });
     }
 
-    return new NextResponse("Order created", { status: 200 });
-  } catch (err) {
-    console.log("[webhooks_POST]", err);
-    return new NextResponse("Failed to create the order", { status: 500 });
+    return new NextResponse("Unhandled event", { status: 200 });
+  } catch (error) {
+    console.error("[webhooks_POST] Error:", error);
+    return new NextResponse("Webhook error", { status: 500 });
   }
 };

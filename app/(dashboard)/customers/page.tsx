@@ -7,7 +7,8 @@ import { connectToDB } from "@/lib/mongoDB";
 const Customers = async () => {
   await connectToDB();
 
-  const customers = await Customer.find().sort({ createdAt: "desc" });
+  const rawCustomers = await Customer.find().sort({ createdAt: "desc" });
+  const customers = JSON.parse(JSON.stringify(rawCustomers));
 
   return (
     <div className="px-10 py-5">

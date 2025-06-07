@@ -23,7 +23,7 @@ export const columns: ColumnDef<CollectionType>[] = [
     cell: ({ row }) => <p>{row.original.products.length}</p>,
   },
   {
-     header: "Action",
+    header: "Action",
     id: "actions",
     cell: ({ row }) => <Delete item="collection" id={row.original._id} />,
   },

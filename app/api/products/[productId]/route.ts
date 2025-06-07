@@ -81,23 +81,18 @@ export const POST = async (
     const addedCollections = collections.filter(
       (collectionId: string) => !product.collections.includes(collectionId)
     );
-    // included in new data, but not included in the previous data
 
     const removedCollections = product.collections.filter(
       (collectionId: string) => !collections.includes(collectionId)
     );
-    // included in previous data, but not included in the new data
 
-    // Update collections
     await Promise.all([
-      // Update added collections with this product
       ...addedCollections.map((collectionId: string) =>
         Collection.findByIdAndUpdate(collectionId, {
           $push: { products: product._id },
         })
       ),
 
-      // Update removed collections without this product
       ...removedCollections.map((collectionId: string) =>
         Collection.findByIdAndUpdate(collectionId, {
           $pull: { products: product._id },
@@ -105,7 +100,6 @@ export const POST = async (
       ),
     ]);
 
-    // Update product
     const updatedProduct = await Product.findByIdAndUpdate(
       product._id,
       {
@@ -156,7 +150,6 @@ export const DELETE = async (
 
     await Product.findByIdAndDelete(product._id);
 
-    // Update collections
     await Promise.all(
       product.collections.map((collectionId: string) =>
         Collection.findByIdAndUpdate(collectionId, {
@@ -175,4 +168,3 @@ export const DELETE = async (
 };
 
 export const dynamic = "force-dynamic";
-

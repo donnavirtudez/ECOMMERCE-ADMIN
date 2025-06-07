@@ -23,7 +23,7 @@ export const GET = async (
         { category: product.category },
         { collections: { $in: product.collections } },
       ],
-      _id: { $ne: product._id }, // Exclude the current product
+      _id: { $ne: product._id },
     });
 
     if (!relatedProducts) {

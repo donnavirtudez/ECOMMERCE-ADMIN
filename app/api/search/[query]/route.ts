@@ -13,7 +13,7 @@ export const GET = async (
       $or: [
         { title: { $regex: params.query, $options: "i" } },
         { category: { $regex: params.query, $options: "i" } },
-        { tags: { $in: [new RegExp(params.query, "i")] } }, // $in is used to match an array of values
+        { tags: { $in: [new RegExp(params.query, "i")] } },
       ],
     });
 

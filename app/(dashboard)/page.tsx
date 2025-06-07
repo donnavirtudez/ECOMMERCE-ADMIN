@@ -7,8 +7,16 @@ import {
   getTotalSales,
 } from "@/lib/actions/actions";
 import { TrendingUp, ShoppingBag, UserRound } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
   const totalRevenue = await getTotalSales().then((data) => data.totalRevenue);
   const totalOrders = await getTotalSales().then((data) => data.totalOrders);
   const totalCustomers = await getTotalCustomers();
