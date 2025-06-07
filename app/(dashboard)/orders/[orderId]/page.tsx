@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/custom ui/DataTable";
-import { columns } from "@/components/orderItems/OrderItemsColums";
+import { columns } from "@/components/orderItems/OrderItemsColumns";
 
 const OrderDetails = async ({ params }: { params: { orderId: string } }) => {
   const res = await fetch(

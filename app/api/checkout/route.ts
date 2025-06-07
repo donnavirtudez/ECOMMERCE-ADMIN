@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
               ...(cartItem.color && { color: cartItem.color }),
             },
           },
-          unit_amount: cartItem.item.price * 100,
+          unit_amount: Math.round(cartItem.item.price * 100),
         },
         quantity: cartItem.quantity,
       })),
