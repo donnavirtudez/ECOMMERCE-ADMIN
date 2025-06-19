@@ -2,7 +2,13 @@ import { DataTable } from "@/components/custom ui/DataTable";
 import { columns } from "@/components/orderItems/OrderItemsColumns";
 import { Separator } from "@/components/ui/separator";
 
-const OrderDetails = async ({ params }: { params: { orderId: string } }) => {
+interface OrderDetailsPageProps {
+  params: {
+    orderId: string;
+  };
+}
+
+const OrderDetails = async ({ params }: OrderDetailsPageProps) => {
   const res = await fetch(`http://localhost:3001/api/orders/${params.orderId}`);
   const { orderDetails, customer } = await res.json();
 
