@@ -56,8 +56,6 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const selectables = collections.filter((c) => !selected.includes(c));
 
-  const toggleOpen = () => setOpen((o) => !o);
-
   return (
     <Command className="overflow-visible bg-[#FFFFFF]" ref={wrapperRef}>
       <div className="flex gap-1 flex-wrap border rounded-md">

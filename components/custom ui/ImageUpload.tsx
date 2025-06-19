@@ -1,4 +1,8 @@
-import { CldUploadWidget } from "next-cloudinary";
+import {
+  CldUploadWidget,
+  CloudinaryUploadWidgetResults,
+  CloudinaryUploadWidgetError,
+} from "next-cloudinary";
 import { Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import Image from "next/image";
@@ -17,17 +21,28 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleUploadSuccess = (result: any) => {
-    onChange(result.info.secure_url);
+  const handleUploadSuccess = (result: CloudinaryUploadWidgetResults) => {
+    if (
+      result.info &&
+      typeof result.info !== "string" &&
+      result.info.secure_url
+    ) {
+      onChange(result.info.secure_url);
+    } else {
+      console.error(
+        "Upload success callback received unexpected result:",
+        result
+      );
+    }
     setIsUploading(false);
   };
 
-  const handleUploadError = (error: any) => {
+  const handleUploadError = (error: CloudinaryUploadWidgetError | null) => {
     console.error("Upload failed:", error);
     setIsUploading(false);
   };
 
-  const handleOpenUpload = (open: Function) => {
+  const handleOpenUpload = (open: () => void) => {
     if (isUploading) return;
 
     open();

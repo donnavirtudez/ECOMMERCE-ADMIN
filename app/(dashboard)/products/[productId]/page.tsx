@@ -2,7 +2,7 @@
 
 import Loader from "@/components/custom ui/Loader";
 import ProductForm from "@/components/products/ProductForm";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 
 const ProductDetails = () => {
@@ -14,7 +14,7 @@ const ProductDetails = () => {
     null
   );
 
-  const getProductDetails = async () => {
+  const getProductDetails = useCallback(async () => {
     try {
       const res = await fetch(`/api/products/${productId}`, {
         method: "GET",
@@ -25,11 +25,11 @@ const ProductDetails = () => {
     } catch (err) {
       console.log("[productId_GET]", err);
     }
-  };
+  }, [productId]);
 
   useEffect(() => {
     if (productId) getProductDetails();
-  }, [productId]);
+  }, [productId, getProductDetails]);
 
   return loading ? <Loader /> : <ProductForm initialData={productDetails} />;
 };

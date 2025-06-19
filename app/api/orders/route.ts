@@ -2,10 +2,10 @@ import Customer from "@/lib/models/Customer";
 import Order from "@/lib/models/Order";
 import { connectToDB } from "@/lib/mongoDB";
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { format } from "date-fns";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
     await connectToDB();
 
@@ -16,9 +16,10 @@ export const GET = async (req: NextRequest) => {
         const customer = await Customer.findOne({
           clerkId: order.customerClerkId,
         });
+
         return {
           _id: order._id,
-          customer: customer.name,
+          customer: customer?.name || "Unknown",
           products: order.products.length,
           totalAmount: order.totalAmount,
           createdAt: format(order.createdAt, "MMM do, yyyy 'at' p"),

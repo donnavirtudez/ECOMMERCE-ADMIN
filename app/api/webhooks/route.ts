@@ -26,16 +26,18 @@ export const POST = async (req: NextRequest) => {
         ],
       });
 
-      const shippingDetails = (fullSession as any).collected_information
-        ?.shipping_details;
-      const address = shippingDetails?.address || {};
+      const collectedInfo =
+        fullSession.collected_information as Stripe.Checkout.Session.CollectedInformation | null;
+
+      const shippingDetails = collectedInfo?.shipping_details;
+      const address = shippingDetails?.address;
 
       const shippingAddress = {
-        street: address.line1 || "",
-        city: address.city || "",
-        state: address.state || "",
-        postalCode: address.postal_code || "",
-        country: address.country || "",
+        street: address?.line1 || "",
+        city: address?.city || "",
+        state: address?.state || "",
+        postalCode: address?.postal_code || "",
+        country: address?.country || "",
       };
 
       const customerInfo = {
@@ -46,12 +48,15 @@ export const POST = async (req: NextRequest) => {
 
       const lineItems = fullSession.line_items?.data || [];
 
-      const orderItems = lineItems.map((item: any) => ({
-        product: item.price.product.metadata.productId,
-        color: item.price.product.metadata.color || "N/A",
-        size: item.price.product.metadata.size || "N/A",
-        quantity: item.quantity,
-      }));
+      const orderItems = lineItems.map((item) => {
+        const product = item.price?.product as Stripe.Product;
+        return {
+          product: product.metadata.productId,
+          color: product.metadata.color || "N/A",
+          size: product.metadata.size || "N/A",
+          quantity: item.quantity,
+        };
+      });
 
       await connectToDB();
 

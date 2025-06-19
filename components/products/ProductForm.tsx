@@ -23,7 +23,6 @@ import toast from "react-hot-toast";
 import Delete from "../custom ui/Delete";
 import MultiText from "../custom ui/MultiText";
 import MultiSelect from "../custom ui/MultiSelect";
-import Loader from "../custom ui/Loader";
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Title is required" }).max(20),

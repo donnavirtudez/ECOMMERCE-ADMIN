@@ -7,13 +7,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
+type CartItem = {
+  item: {
+    _id: string;
+    title: string;
+    price: number;
+  };
+  quantity: number;
+  size?: string;
+  color?: string;
+};
+
+type Customer = {
+  clerkId: string;
+};
+
+type CheckoutRequestBody = {
+  cartItems: CartItem[];
+  customer: Customer;
+};
+
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { cartItems, customer } = await req.json();
+    const { cartItems, customer }: CheckoutRequestBody = await req.json();
 
     if (!cartItems || !customer) {
       return new NextResponse("Not enough data to checkout", { status: 400 });
@@ -41,7 +61,7 @@ export async function POST(req: NextRequest) {
         { shipping_rate: "shr_1RV3tHPoSiSdfDr7WuEOogco" },
         { shipping_rate: "shr_1RV3usPoSiSdfDr7stDKCy3q" },
       ],
-      line_items: cartItems.map((cartItem: any) => ({
+      line_items: cartItems.map((cartItem: CartItem) => ({
         price_data: {
           currency: "php",
           product_data: {

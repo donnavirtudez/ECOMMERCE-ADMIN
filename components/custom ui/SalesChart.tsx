@@ -10,7 +10,12 @@ import {
   Tooltip,
 } from "recharts";
 
-const SalesChart = ({ data }: { data: any[] }) => {
+interface SalesDataPoint {
+  name: string;
+  sales: number;
+}
+
+const SalesChart = ({ data }: { data: SalesDataPoint[] }) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart

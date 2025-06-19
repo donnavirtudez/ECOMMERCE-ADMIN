@@ -1,22 +1,15 @@
 "use client";
 
-import { UserButton, useUser, useClerk } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { navLinks } from "@/lib/constants";
 
 const LeftSideBar = () => {
   const pathname = usePathname();
   const { user } = useUser();
-  const { signOut } = useClerk();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/sign-in");
-  };
 
   return (
     <div className="h-screen left-0 top-0 sticky p-10 flex flex-col gap-16 bg-[#F0F0F0] max-lg:hidden">

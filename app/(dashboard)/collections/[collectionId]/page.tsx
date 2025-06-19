@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 
 import Loader from "@/components/custom ui/Loader";
@@ -14,7 +14,7 @@ const CollectionDetails = () => {
   const [collectionDetails, setCollectionDetails] =
     useState<CollectionType | null>(null);
 
-  const getCollectionDetails = async () => {
+  const getCollectionDetails = useCallback(async () => {
     try {
       const res = await fetch(`/api/collections/${collectionId}`, {
         method: "GET",
@@ -25,13 +25,13 @@ const CollectionDetails = () => {
     } catch (err) {
       console.log("[collectionId_GET]", err);
     }
-  };
+  }, [collectionId]);
 
   useEffect(() => {
     if (collectionId) {
       getCollectionDetails();
     }
-  }, [collectionId]);
+  }, [collectionId, getCollectionDetails]);
 
   return loading ? (
     <Loader />

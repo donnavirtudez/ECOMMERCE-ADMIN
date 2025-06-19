@@ -1,10 +1,10 @@
 "use client";
 
-import { UserButton, useClerk } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { navLinks } from "@/lib/constants";
@@ -12,15 +12,8 @@ import { navLinks } from "@/lib/constants";
 const TopBar = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const pathname = usePathname();
-  const { signOut } = useClerk();
-  const router = useRouter();
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/sign-in");
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

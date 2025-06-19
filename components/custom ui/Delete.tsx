@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Trash } from "lucide-react";
 
 import {
@@ -23,18 +22,14 @@ interface DeleteProps {
 }
 
 const Delete: React.FC<DeleteProps> = ({ item, id }) => {
-  const [loading, setLoading] = useState(false);
-
   const onDelete = async () => {
     try {
-      setLoading(true);
       const itemType = item === "product" ? "products" : "collections";
       const res = await fetch(`/api/${itemType}/${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
-        setLoading(false);
         window.location.href = `/${itemType}`;
         toast.success("Deleted successfully", {
           duration: 2000,
@@ -53,6 +48,7 @@ const Delete: React.FC<DeleteProps> = ({ item, id }) => {
       });
     }
   };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
